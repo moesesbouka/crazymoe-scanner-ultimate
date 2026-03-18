@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="theme-color" content="#080808"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="CM Scanner"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<title>CrazyMoe Scanner Ultimate</title>
+<style>
+:root{
+  --bg:#080808;--s1:#111;--s2:#1a1a1a;--s3:#222;
+  --border:rgba(255,255,255,.07);--border2:rgba(249,115,22,.25);
+  --text:#f2f2f2;--muted:#888;--dim:#555;
+  --accent:#f97316;--accent2:#fbbf24;--accentd:#c2530a;
+  --ok:#22c55e;--err:#ef4444;--warn:#f59e0b;
+  --r:18px;--r2:28px;--shadow:0 8px 40px rgba(0,0,0,.6);
+  --safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px)
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.5}
+input,select,textarea,button{font-family:inherit}
+.app{max-width:760px;margin:0 auto;padding:calc(12px + var(--safe-top)) 14px calc(32px + var(--safe-bot))}
+
+/* ─── HEADER ──────────────────────────────── */
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:14px;gap:10px}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.75rem;letter-spacing:.05em;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1}
+.nav{display:flex;gap:8px}
+
+/* ─── BUTTONS ─────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:13px 18px;border-radius:var(--r);border:1px solid var(--border);background:var(--s2);color:var(--text);font-weight:700;font-size:.93rem;cursor:pointer;transition:all .15s;white-space:nowrap;-webkit-user-select:none;user-select:none}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#000;box-shadow:0 4px 20px rgba(249,115,22,.35)}
+.btn.primary:active{background:var(--accentd)}
+.btn.ghost{background:transparent;border-color:var(--border)}
+.btn.ghost:hover{background:var(--s2)}
+.btn.amber{background:var(--accent2);border-color:var(--accent2);color:#000}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#000}
+.btn.danger{background:var(--err);border-color:var(--err)}
+.btn.sm{padding:9px 13px;font-size:.85rem;border-radius:12px}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.btn-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+.btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.btn-grid.single{grid-template-columns:1fr}
+
+/* ─── CARDS / SECTIONS ──────────────────── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:14px}
+.card.accent-border{border-color:var(--border2)}
+.card-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.03em;margin-bottom:4px;color:var(--text)}
+.card-sub{color:var(--muted);font-size:.88rem;margin-bottom:14px}
+.hidden{display:none!important}
+
+/* ─── INPUTS ──────────────────────────────── */
+.field{width:100%;padding:13px 15px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.95rem;outline:none;transition:border-color .15s}
+.field:focus{border-color:var(--accent)}
+.field::placeholder{color:var(--dim)}
+select.field option{background:var(--s2);color:var(--text)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.field-grid.single{grid-template-columns:1fr}
+textarea.field{min-height:110px;resize:vertical}
+
+/* ─── STEP BAR ────────────────────────────── */
+.stepbar{display:flex;align-items:center;gap:0;margin-bottom:14px}
+.stepbar-item{flex:1;text-align:center;padding:10px 4px;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.04em;border-radius:0;background:var(--s2);border:1px solid var(--border);color:var(--dim);transition:all .2s;cursor:default;position:relative}
+.stepbar-item:first-child{border-radius:var(--r) 0 0 var(--r)}
+.stepbar-item:last-child{border-radius:0 var(--r) var(--r) 0}
+.stepbar-item+.stepbar-item{margin-left:-1px}
+.stepbar-item.active{background:var(--accent);border-color:var(--accent);color:#000;z-index:1}
+.stepbar-item.done{background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.25);color:var(--accent2)}
+
+/* ─── STATUS ──────────────────────────────── */
+.status{font-size:.87rem;min-height:20px;margin-top:10px;color:var(--muted)}
+.status.ok{color:var(--ok)}
+.status.err{color:var(--err)}
+.status.warn{color:var(--warn)}
+
+/* ─── SCANNER / READER ───────────────────── */
+#reader{width:100%;min-height:260px;overflow:hidden;border-radius:16px;background:#000;border:1px solid var(--border)}
+
+/* ─── RESULTS ─────────────────────────────── */
+.results-list{display:grid;gap:12px;margin-top:4px}
+.result-card{display:grid;grid-template-columns:110px 1fr;gap:14px;padding:14px;border-radius:var(--r);border:1px solid var(--border);background:var(--s2);cursor:pointer;transition:border-color .15s}
+.result-card:hover,.result-card:active{border-color:var(--accent)}
+.result-thumb{width:110px;height:110px;object-fit:cover;border-radius:12px;background:var(--s3)}
+.result-thumb-empty{width:110px;height:110px;border-radius:12px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:2.2rem}
+.result-info h3{font-weight:700;font-size:1rem;line-height:1.3;margin-bottom:6px}
+.result-info .desc{font-size:.82rem;color:var(--muted);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.src-badge{display:inline-block;padding:3px 9px;border-radius:999px;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.2);color:var(--accent2);font-size:.72rem;font-weight:700;letter-spacing:.04em;margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{padding:4px 9px;border-radius:999px;background:var(--s3);border:1px solid var(--border);color:var(--muted);font-size:.75rem}
+
+/* ─── CAMERA ──────────────────────────────── */
+.cam-wrap{position:relative;border-radius:var(--r2);overflow:hidden;background:#000;border:1px solid var(--border);margin-bottom:12px}
+video{display:block;width:100%;max-height:52vh;object-fit:cover}
+.cam-controls{position:absolute;bottom:0;left:0;right:0;padding:10px;background:linear-gradient(transparent,rgba(0,0,0,.7));display:flex;gap:8px;justify-content:center}
+.focus-ring{position:absolute;width:70px;height:70px;border-radius:14px;border:2px solid #fff;box-shadow:0 0 0 2px rgba(249,115,22,.4);transform:translate(-50%,-50%) scale(.7);opacity:0;transition:.15s;pointer-events:none}
+.focus-ring.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+/* ─── PHOTOS GRID ─────────────────────────── */
+.photos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.photo-tile{position:relative;aspect-ratio:1/1;border-radius:var(--r);overflow:hidden;background:var(--s3);border:1px solid var(--border)}
+.photo-tile img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-tile .del-btn{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:999px;border:none;background:rgba(0,0,0,.7);color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.photo-tile .idx-label{position:absolute;bottom:5px;left:7px;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.7);text-shadow:0 1px 2px rgba(0,0,0,.8)}
+.photo-add-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1/1;border-radius:var(--r);border:2px dashed var(--border);background:transparent;cursor:pointer;font-size:1.6rem;gap:4px}
+.photo-add-tile span{font-size:.72rem;color:var(--muted)}
+
+/* ─── REVIEW ─────────────────────────────── */
+.review-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.review-row:last-child{border-bottom:none}
+.review-row .lbl{color:var(--muted);font-size:.88rem;min-width:80px}
+.review-row .val{font-weight:600;text-align:right;font-size:.92rem;word-break:break-word}
+.review-photos{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.review-photos img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;border:1px solid var(--border)}
+
+/* ─── DASHBOARD ────────────────────────────── */
+.dash-item{display:flex;align-items:center;gap:14px;padding:14px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px}
+.dash-thumb{width:56px;height:56px;border-radius:10px;object-fit:cover;background:var(--s3);flex-shrink:0}
+.dash-info h4{font-weight:700;font-size:.95rem;margin-bottom:2px}
+.dash-info .meta{font-size:.78rem;color:var(--muted)}
+
+/* ─── INSTALL BANNER ────────────────────────── */
+.install-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:linear-gradient(90deg,rgba(249,115,22,.12),rgba(251,191,36,.08));border:1px solid rgba(249,115,22,.25);border-radius:var(--r);margin-bottom:14px}
+.install-bar p{font-size:.88rem;color:var(--accent2)}
+.install-bar .close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:4px}
+
+/* ─── SETTINGS ACCORDION ──────────────────── */
+.settings-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 0}
+.settings-toggle h3{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.03em;color:var(--muted)}
+.settings-toggle svg{transition:transform .2s;flex-shrink:0}
+.settings-toggle.open svg{transform:rotate(180deg)}
+.settings-body{overflow:hidden;max-height:0;transition:max-height .3s ease}
+.settings-body.open{max-height:600px}
+
+/* ─── NO-RESULTS CARD ─────────────────────── */
+.no-result-card{text-align:center;padding:28px 20px}
+.no-result-card .icon{font-size:3rem;margin-bottom:10px}
+.no-result-card h3{font-size:1.1rem;font-weight:700;margin-bottom:6px}
+.no-result-card p{color:var(--muted);font-size:.88rem;margin-bottom:16px}
+
+/* ─── RESPONSIVE ─────────────────────────── */
+@media(max-width:560px){
+  .field-grid{grid-template-columns:1fr}
+  .result-card{grid-template-columns:80px 1fr;gap:10px}
+  .result-thumb,.result-thumb-empty{width:80px;height:80px}
+  .photos-grid{grid-template-columns:repeat(3,1fr)}
+  .btn-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- INSTALL BANNER -->
+  <div class="install-bar hidden" id="installBar">
+    <p>📲 Add CrazyMoe Scanner to your home screen for the best experience</p>
+    <button class="btn primary sm" id="installBtn">Install</button>
+    <button class="close" id="installClose" aria-label="Dismiss">✕</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">CrazyMoe Scanner</div>
+    <nav class="nav">
+      <button class="btn sm primary" id="navScanner">Scanner</button>
+      <button class="btn sm ghost" id="navDash">Dashboard</button>
+    </nav>
+  </div>
+
+  <!-- SCANNER PAGE -->
+  <div id="pageScanner">
+
+    <!-- SETTINGS -->
+    <div class="card" id="settingsCard">
+      <div class="settings-toggle" id="settingsToggle">
+        <h3>⚙️ Supabase Setup</h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="settings-body" id="settingsBody">
+        <div style="height:14px"></div>
+        <div class="field-grid">
+          <input class="field" id="cfgUrl" placeholder="Supabase URL"/>
+          <input class="field" id="cfgKey" placeholder="Supabase anon key" type="password"/>
+          <input class="field" id="cfgTable" placeholder="Table name" value="active_listings"/>
+          <input class="field" id="cfgBucket" placeholder="Storage bucket" value="listing-photos"/>
+          <input class="field" id="cfgFolder" placeholder="Storage folder" value="scanner-intake"/>
+          <input class="field" id="cfgDiscount" type="number" step="1" min="0" max="99" placeholder="Discount % off source price"/>
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" id="btnSaveSettings">Save Settings</button>
+          <button class="btn ghost" id="btnContinueDraft">Continue Draft</button>
+        </div>
+        <div class="status" id="stSettings"></div>
+      </div>
+    </div>
+
+    <!-- STEP BAR -->
+    <div class="stepbar" id="stepbar">
+      <div class="stepbar-item active" data-step="1">1·Identify</div>
+      <div class="stepbar-item" data-step="2">2·Results</div>
+      <div class="stepbar-item" data-step="3">3·Photos</div>
+      <div class="stepbar-item" data-step="4">4·Details</div>
+      <div class="stepbar-item" data-step="5">5·Review</div>
+    </div>
+
+    <!-- STEP 1: IDENTIFY -->
+    <div class="card step-panel" id="step1">
+      <div class="card-title">Identify the Item</div>
+      <div class="card-sub">Scan a barcode, upload a barcode image, or type a UPC / model number</div>
+
+      <div class="btn-grid">
+        <button class="btn primary" id="btnStartScan">📷 Live Scan</button>
+        <button class="btn ghost" id="btnStopScan" disabled>⏹ Stop Scan</button>
+        <button class="btn ghost" id="btnUploadBarcode">🧾 Upload Barcode Image</button>
+        <button class="btn ghost" id="btnUploadProduct">🖼 Add Product Photos</button>
+      </div>
+      <input type="file" accept="image/*" id="inputBarcode" class="hidden"/>
+      <input type="file" accept="image/*" multiple id="inputProduct" class="hidden"/>
+
+      <div id="reader" class="hidden" style="margin-top:12px"></div>
+
+      <div style="display:flex;gap:9px;margin-top:14px">
+        <input class="field" id="lookupText" placeholder="UPC or model number" style="flex:1" autocomplete="off"/>
+        <button class="btn primary" id="btnLookup">Look Up</button>
+      </div>
+      <div class="status" id="stIdentify"></div>
+    </div>
+
+    <!-- STEP 2: RESULTS -->
+    <div class="card step-panel hidden" id="step2">
+      <div class="card-title">Pick the Right Match</div>
+      <div class="card-sub" id="resultsSubtitle">Ranked from UPC databases, open sources, and web fallbacks</div>
+      <div class="results-list" id="resultsList"></div>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn ghost" id="btnBackToIdentify">← Back</button>
+      </div>
+      <div class="status" id="stResults"></div>
+    </div>
+
+    <!-- STEP 3: PHOTOS -->
+    <div class="card step-panel hidden" id="step3">
+      <div class="card-title">Photos</div>
+      <div class="card-sub">Take or upload photos of the item. Up to 10. Drag to reorder.</div>
+
+      <div class="cam-wrap">
+        <video id="camVideo" autoplay playsinline muted></video>
+        <div class="focus-ring" id="focusRing"></div>
+        <div class="cam-controls">
+          <button class="btn sm ghost" id="btnCamStart">Start Camera</button>
+          <button class="btn sm ghost" id="btnCamSwitch">Flip</button>
+          <button class="btn sm primary" id="btnCapture">📸 Capture</button>
+          <button class="btn sm ghost" id="btnBurst">Burst ×3</button>
+        </div>
+      </div>
+
+      <div class="photos-grid" id="photosGrid"></div>
+      <input type="file" accept="image/*" multiple id="inputPhotoFile" class="hidden"/>
+
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn ghost" id="btnAddPhotoFile">📁 Add from File</button>
+        <button class="btn ghost" id="btnBackToResults">← Back to Results</button>
+        <button class="btn primary" id="btnToDetails">Next: Details →</button>
+      </div>
+      <div class="status" id="stPhotos"></div>
+    </div>
+
+    <!-- STEP 4: DETAILS -->
+    <div class="card step-panel hidden" id="step4">
+      <div class="card-title">Item Details</div>
+      <div class="card-sub">Review and edit before saving</div>
+      <div class="field-grid">
+        <input class="field" id="fTitle" placeholder="Title" style="grid-column:1/-1"/>
+        <input class="field" id="fPrice" type="number" step="0.01" placeholder="Price ($)"/>
+        <select class="field" id="fCondition">
+          <option>New</option>
+          <option>Used – Like New</option>
+          <option selected>Used – Good</option>
+          <option>Used – Fair</option>
+          <option>For Parts / Not Working</option>
+        </select>
+        <input class="field" id="fSource" placeholder="Source (e.g. Warehouse)" style="grid-column:1/-1"/>
+      </div>
+      <textarea class="field" id="fDescription" placeholder="Description (optional)"></textarea>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn ghost" id="btnBackToPhotos">← Back to Photos</button>
+        <button class="btn primary" id="btnToReview">Next: Review →</button>
+      </div>
+      <div class="status" id="stDetails"></div>
+    </div>
+
+    <!-- STEP 5: REVIEW -->
+    <div class="card step-panel hidden" id="step5">
+      <div class="card-title">Review &amp; Save</div>
+      <div class="card-sub">Confirm everything looks right before saving</div>
+      <div id="reviewContent"></div>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn ghost" id="btnBackToDetails">← Back to Details</button>
+        <button class="btn amber" id="btnSaveDraft">Save Draft</button>
+        <button class="btn ok" id="btnSaveSupabase">💾 Save to Supabase</button>
+      </div>
+      <div class="status" id="stSave"></div>
+    </div>
+
+  </div><!-- /pageScanner -->
+
+  <!-- DASHBOARD PAGE -->
+  <div id="pageDash" class="hidden">
+    <div class="card">
+      <div class="card-title">Dashboard</div>
+      <div class="card-sub">Items saved on this device</div>
+      <div id="dashList"></div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+'use strict';
+
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+const LSKEY = 'crazymoe_scanner_v3';
+let S = {
+  step: 1,
+  lookupQuery: '',
+  results: [],
+  selected: null,
+  photos: [],       // array of data-url strings
+  details: { title: '', price: '', condition: 'Used – Good', source: '', description: '' },
+  settings: { url: '', key: '', table: 'active_listings', bucket: 'listing-photos', folder: 'scanner-intake', discount: '' },
+  drafts: [],
+  draft: null,
+  camFacing: 'environment',
+  camStream: null,
+  scanner: null,
+  scanning: false
+};
+
+// ─────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function setStatus(id, msg, kind = '') {
+  const el = $(id);
+  if (!el) return;
+  el.className = 'status' + (kind ? ' ' + kind : '');
+  el.textContent = msg || '';
+}
+
+function isUPC(v) {
+  return /^\d{8,14}$/.test(String(v || '').trim());
+}
+
+function applyDiscount(price) {
+  const n = parseFloat(price);
+  if (!isFinite(n) || n <= 0) return '';
+  const d = parseFloat(S.settings.discount);
+  if (isFinite(d) && d > 0) return (n * (1 - d / 100)).toFixed(2);
+  return n.toFixed(2);
+}
+
+// ─────────────────────────────────────────────────────────────
+// PERSIST
+// ─────────────────────────────────────────────────────────────
+function persist() {
+  try {
+    localStorage.setItem(LSKEY, JSON.stringify({
+      settings: S.settings,
+      draft: S.draft,
+      drafts: S.drafts
+    }));
+  } catch (e) {}
+}
+
+function hydrate() {
+  try {
+    const raw = localStorage.getItem(LSKEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d.settings) Object.assign(S.settings, d.settings);
+    if (d.draft) S.draft = d.draft;
+    if (Array.isArray(d.drafts)) S.drafts = d.drafts;
+  } catch (e) {}
+}
+
+function applySettingsToInputs() {
+  $('cfgUrl').value = S.settings.url || '';
+  $('cfgKey').value = S.settings.key || '';
+  $('cfgTable').value = S.settings.table || 'active_listings';
+  $('cfgBucket').value = S.settings.bucket || 'listing-photos';
+  $('cfgFolder').value = S.settings.folder || 'scanner-intake';
+  $('cfgDiscount').value = S.settings.discount || '';
+}
+
+function readSettingsFromInputs() {
+  S.settings.url = $('cfgUrl').value.trim();
+  S.settings.key = $('cfgKey').value.trim();
+  S.settings.table = $('cfgTable').value.trim() || 'active_listings';
+  S.settings.bucket = $('cfgBucket').value.trim() || 'listing-photos';
+  S.settings.folder = $('cfgFolder').value.trim() || 'scanner-intake';
+  S.settings.discount = $('cfgDiscount').value.trim();
+  persist();
+}
+
+// ─────────────────────────────────────────────────────────────
+// NAV / PAGES
+// ─────────────────────────────────────────────────────────────
+function showPage(page) {
+  $('pageScanner').classList.toggle('hidden', page !== 'scanner');
+  $('pageDash').classList.toggle('hidden', page !== 'dashboard');
+  $('navScanner').className = 'btn sm ' + (page === 'scanner' ? 'primary' : 'ghost');
+  $('navDash').className = 'btn sm ' + (page === 'dashboard' ? 'primary' : 'ghost');
+  if (page === 'dashboard') renderDashboard();
+}
+
+// ─────────────────────────────────────────────────────────────
+// STEP FLOW
+// ─────────────────────────────────────────────────────────────
+function setStep(n) {
+  S.step = n;
+  // Update step bar
+  document.querySelectorAll('.stepbar-item').forEach(el => {
+    const sn = parseInt(el.dataset.step);
+    el.className = 'stepbar-item' + (sn === n ? ' active' : sn < n ? ' done' : '');
+  });
+  // Show/hide panels
+  document.querySelectorAll('.step-panel').forEach((el, i) => {
+    el.classList.toggle('hidden', i !== n - 1);
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Side effects per step
+  if (n === 3) {
+    renderPhotos();
+    startCamera();
+  }
+  if (n !== 3) {
+    stopCamera();
+  }
+  if (n === 4) {
+    hydrateDetails();
+  }
+  if (n === 5) {
+    syncDetails();
+    renderReview();
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// SETTINGS ACCORDION
+// ─────────────────────────────────────────────────────────────
+function initSettingsAccordion() {
+  const toggle = $('settingsToggle');
+  const body = $('settingsBody');
+  // Auto-open if no settings saved yet
+  const hasSettings = S.settings.url && S.settings.key;
+  if (!hasSettings) {
+    toggle.classList.add('open');
+    body.classList.add('open');
+  }
+  toggle.addEventListener('click', () => {
+    const isOpen = body.classList.contains('open');
+    toggle.classList.toggle('open', !isOpen);
+    body.classList.toggle('open', !isOpen);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// SCANNER (html5-qrcode)
+// ─────────────────────────────────────────────────────────────
+async function startLiveScan() {
+  if (S.scanning) return;
+  const readerEl = $('reader');
+  readerEl.classList.remove('hidden');
+  setStatus('stIdentify', 'Starting camera scanner…');
+  try {
+    S.scanner = new Html5Qrcode('reader');
+    await S.scanner.start(
+      { facingMode: 'environment' },
+      { fps: 12, qrbox: { width: 260, height: 160 } },
+      async decoded => {
+        await stopLiveScan();
+        $('lookupText').value = decoded;
+        await runLookup(decoded);
+      },
+      () => {}
+    );
+    S.scanning = true;
+    $('btnStopScan').disabled = false;
+    setStatus('stIdentify', 'Scanner active – point at barcode', 'ok');
+  } catch (e) {
+    readerEl.classList.add('hidden');
+    setStatus('stIdentify', 'Camera scanner could not start on this device. Try uploading a barcode image instead.', 'warn');
+  }
+}
+
+async function stopLiveScan() {
+  if (S.scanner && S.scanning) {
+    try { await S.scanner.stop(); } catch (_) {}
+    try { await S.scanner.clear(); } catch (_) {}
+  }
+  S.scanner = null;
+  S.scanning = false;
+  $('reader').classList.add('hidden');
+  $('btnStopScan').disabled = true;
+}
+
+async function scanFileForBarcode(file) {
+  const tmpId = 'qrtmp_' + Date.now();
+  const div = document.createElement('div');
+  div.id = tmpId;
+  div.style.display = 'none';
+  document.body.appendChild(div);
+  const qr = new Html5Qrcode(tmpId);
+  try {
+    const code = await qr.scanFile(file, true);
+    try { await qr.clear(); } catch (_) {}
+    div.remove();
+    return code;
+  } catch (_) {
+    try { await qr.clear(); } catch (_2) {}
+    div.remove();
+    return null;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// LOOKUP
+// ─────────────────────────────────────────────────────────────
+async function runLookup(raw) {
+  const q = String(raw || '').trim();
+  if (!q) return setStatus('stIdentify', 'Enter a UPC or model number first', 'warn');
+  S.lookupQuery = q;
+  stopLiveScan();
+  setStep(2);
+  setStatus('stResults', 'Looking up product…');
+  $('resultsList').innerHTML = '';
+  $('resultsSubtitle').textContent = 'Searching UPC databases, open sources and web fallbacks…';
+  try {
+    const res = await fetch('/.netlify/functions/lookup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: q })
+    });
+    if (!res.ok) throw new Error(`Server error: ${res.status}`);
+    const data = await res.json();
+    S.results = data.results || [];
+    renderResults(data);
+  } catch (e) {
+    S.results = [];
+    renderNoResults({ message: e.message || 'Lookup failed', checked: [] });
+    setStatus('stResults', e.message || 'Lookup failed', 'err');
+    // If it looks like a functions error, show helpful hint
+    if (e.message && (e.message.includes('404') || e.message.includes('Failed to fetch'))) {
+      setStatus('stResults', 'Lookup failed – make sure this is deployed to Netlify with Functions support, not a static drag-drop deploy.', 'err');
+    }
+  }
+}
+
+function renderResults(data) {
+  const list = $('resultsList');
+  const checked = (data.checked || []).join(', ') || 'hybrid sources';
+  if (!S.results.length) {
+    renderNoResults({ message: data.message, checked: data.checked || [] });
+    setStatus('stResults', `No matches found. Checked: ${checked}`, 'warn');
+    $('resultsSubtitle').textContent = `Checked: ${checked}`;
+    return;
+  }
+  $('resultsSubtitle').textContent = `${S.results.length} match${S.results.length !== 1 ? 'es' : ''} • Sources: ${checked}`;
+  setStatus('stResults', '', '');
+  list.innerHTML = '';
+  S.results.forEach((r, idx) => {
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    const thumbHtml = r.thumbnail
+      ? `<img class="result-thumb" src="${esc(r.thumbnail)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`
+      : '';
+    const emptyThumb = `<div class="result-thumb-empty" ${r.thumbnail ? 'style="display:none"' : ''}>📦</div>`;
+    const srcName = (r.source || 'source').toUpperCase().replace(/-/g, ' ');
+    const pct = Math.round((r.confidence || 0) * 100);
+    const chipsHtml = (r.chips || []).slice(0, 5).map(c => `<span class="chip">${esc(c)}</span>`).join('');
+    card.innerHTML = `
+      <div style="position:relative">${thumbHtml}${emptyThumb}</div>
+      <div class="result-info">
+        <div class="src-badge">${esc(srcName)} ${pct}%</div>
+        <h3>${esc(r.title || 'Untitled')}</h3>
+        ${r.description ? `<div class="desc">${esc(r.description)}</div>` : ''}
+        <div class="chips">${chipsHtml}</div>
+        <div class="btn-row" style="margin-top:10px">
+          <button class="btn sm primary use-btn" data-idx="${idx}">Use This Match</button>
+        </div>
+      </div>`;
+    list.appendChild(card);
+  });
+  list.querySelectorAll('.use-btn').forEach(btn => {
+    btn.addEventListener('click', () => selectResult(S.results[parseInt(btn.dataset.idx)]));
+  });
+}
+
+function renderNoResults({ message, checked }) {
+  const list = $('resultsList');
+  const checkedStr = (checked || []).join(', ') || 'hybrid sources';
+  list.innerHTML = `
+    <div class="card no-result-card" style="margin-bottom:0">
+      <div class="icon">🔍</div>
+      <h3>No matches found</h3>
+      <p>${esc(message || 'The item was not found in any database.')}</p>
+      <p style="font-size:.8rem;margin-bottom:16px">Checked: ${esc(checkedStr)}</p>
+      <div class="btn-grid">
+        <button class="btn primary" id="btnCustomItem">Continue as Custom Item</button>
+        <button class="btn ghost" id="btnOpenEbay">Search eBay</button>
+        <button class="btn ghost" id="btnOpenGoogle">Search Google</button>
+      </div>
+    </div>`;
+  $('btnCustomItem').addEventListener('click', () => {
+    selectResult({ title: S.lookupQuery, price: '', description: '', source: 'custom', thumbnail: '', chips: [`UPC/Model: ${S.lookupQuery}`] });
+  });
+  $('btnOpenEbay').addEventListener('click', () => window.open(`https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(S.lookupQuery)}`, '_blank'));
+  $('btnOpenGoogle').addEventListener('click', () => window.open(`https://www.google.com/search?q=${encodeURIComponent(S.lookupQuery)}`, '_blank'));
+}
+
+function selectResult(r) {
+  S.selected = {
+    title: r.title || S.lookupQuery || '',
+    price: applyDiscount(r.price || ''),
+    condition: 'Used – Good',
+    description: r.description || '',
+    source: r.source || 'lookup',
+    brand: r.brand || '',
+    model: r.model || '',
+    upc: r.upc || (isUPC(S.lookupQuery) ? S.lookupQuery : ''),
+    thumbnail: r.thumbnail || '',
+    chips: r.chips || []
+  };
+  setStep(3);
+}
+
+// ─────────────────────────────────────────────────────────────
+// CAMERA (for photos step)
+// ─────────────────────────────────────────────────────────────
+async function startCamera() {
+  await stopCamera();
+  try {
+    S.camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: S.camFacing, width: { ideal: 1280 }, height: { ideal: 960 } },
+      audio: false
+    });
+    $('camVideo').srcObject = S.camStream;
+    setStatus('stPhotos', 'Camera ready', 'ok');
+  } catch (e) {
+    setStatus('stPhotos', 'Camera not available – you can still add photos from file', 'warn');
+  }
+}
+
+async function stopCamera() {
+  if (S.camStream) {
+    S.camStream.getTracks().forEach(t => t.stop());
+    S.camStream = null;
+  }
+  $('camVideo').srcObject = null;
+}
+
+function capturePhoto() {
+  const v = $('camVideo');
+  if (!v.videoWidth) return setStatus('stPhotos', 'Camera not ready yet', 'warn');
+  if (S.photos.length >= 10) return setStatus('stPhotos', 'Max 10 photos reached', 'warn');
+  const c = document.createElement('canvas');
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext('2d').drawImage(v, 0, 0);
+  S.photos.push(c.toDataURL('image/jpeg', 0.9));
+  renderPhotos();
+  setStatus('stPhotos', `Photo ${S.photos.length} captured`, 'ok');
+}
+
+async function burstCapture() {
+  for (let i = 0; i < 3 && S.photos.length < 10; i++) {
+    capturePhoto();
+    await new Promise(r => setTimeout(r, 350));
+  }
+}
+
+function renderPhotos() {
+  const grid = $('photosGrid');
+  grid.innerHTML = '';
+  S.photos.forEach((src, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'photo-tile';
+    tile.draggable = true;
+    tile.dataset.i = i;
+    tile.innerHTML = `<img src="${src}" alt=""/><button class="del-btn" aria-label="Remove">×</button><span class="idx-label">${i + 1}</span>`;
+    tile.querySelector('.del-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      S.photos.splice(i, 1);
+      renderPhotos();
+    });
+    tile.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', String(i)));
+    tile.addEventListener('dragover', e => e.preventDefault());
+    tile.addEventListener('drop', e => {
+      e.preventDefault();
+      const from = parseInt(e.dataTransfer.getData('text/plain'));
+      const to = i;
+      if (from === to) return;
+      const [moved] = S.photos.splice(from, 1);
+      S.photos.splice(to, 0, moved);
+      renderPhotos();
+    });
+    grid.appendChild(tile);
+  });
+  if (S.photos.length < 10) {
+    const addTile = document.createElement('div');
+    addTile.className = 'photo-add-tile';
+    addTile.innerHTML = '<span>＋</span><span>Add Photo</span>';
+    addTile.addEventListener('click', () => $('inputPhotoFile').click());
+    grid.appendChild(addTile);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// DETAILS
+// ─────────────────────────────────────────────────────────────
+function hydrateDetails() {
+  const s = S.selected || {};
+  $('fTitle').value = s.title || '';
+  $('fPrice').value = s.price || '';
+  $('fCondition').value = s.condition || 'Used – Good';
+  $('fSource').value = s.source || '';
+  $('fDescription').value = s.description || '';
+}
+
+function syncDetails() {
+  if (!S.selected) S.selected = {};
+  S.selected.title = $('fTitle').value.trim();
+  S.selected.price = $('fPrice').value.trim();
+  S.selected.condition = $('fCondition').value;
+  S.selected.source = $('fSource').value.trim();
+  S.selected.description = $('fDescription').value.trim();
+}
+
+// ─────────────────────────────────────────────────────────────
+// REVIEW
+// ─────────────────────────────────────────────────────────────
+function renderReview() {
+  const s = S.selected || {};
+  const rows = [
+    ['Title', s.title || '—'],
+    ['Price', s.price ? `$${s.price}` : '—'],
+    ['Condition', s.condition || '—'],
+    ['Source', s.source || '—'],
+    ['UPC', s.upc || '—'],
+    ['Photos', String(S.photos.length)],
+  ];
+  let html = rows.map(([l, v]) => `
+    <div class="review-row">
+      <span class="lbl">${esc(l)}</span>
+      <span class="val">${esc(v)}</span>
+    </div>`).join('');
+  if (S.photos.length) {
+    html += `<div class="review-photos">${S.photos.slice(0, 8).map(p => `<img src="${p}" alt=""/>`).join('')}</div>`;
+  }
+  if (s.description) {
+    html += `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:.88rem;color:var(--muted)">${esc(s.description)}</div>`;
+  }
+  $('reviewContent').innerHTML = html;
+}
+
+// ─────────────────────────────────────────────────────────────
+// DRAFT
+// ─────────────────────────────────────────────────────────────
+function saveDraft() {
+  syncDetails();
+  S.draft = {
+    selected: S.selected,
+    photos: S.photos,
+    lookupQuery: S.lookupQuery,
+    savedAt: new Date().toISOString()
+  };
+  persist();
+  setStatus('stSave', 'Draft saved locally', 'ok');
+}
+
+function loadDraft() {
+  if (!S.draft) return setStatus('stSettings', 'No saved draft found', 'warn');
+  S.selected = S.draft.selected || null;
+  S.photos = S.draft.photos || [];
+  S.lookupQuery = S.draft.lookupQuery || '';
+  hydrateDetails();
+  renderPhotos();
+  setStep(S.selected ? 4 : 1);
+  setStatus('stSettings', 'Draft restored', 'ok');
+}
+
+// ─────────────────────────────────────────────────────────────
+// SUPABASE SAVE
+// ─────────────────────────────────────────────────────────────
+async function uploadPhoto(dataUrl, idx) {
+  const { url, key, bucket, folder } = S.settings;
+  const res = await fetch(dataUrl);
+  const blob = await res.blob();
+  const ext = blob.type.includes('png') ? 'png' : 'jpg';
+  const path = `${folder}/${Date.now()}_${idx}.${ext}`;
+  const base = url.replace(/\/$/, '');
+  const up = await fetch(`${base}/storage/v1/object/${bucket}/${path}`, {
+    method: 'POST',
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      'Content-Type': blob.type,
+      'x-upsert': 'true'
+    },
+    body: blob
+  });
+  if (!up.ok) {
+    const msg = await up.text();
+    throw new Error(`Photo upload failed: ${msg}`);
+  }
+  return {
+    path,
+    url: `${base}/storage/v1/object/public/${bucket}/${path}`
+  };
+}
+
+async function saveToSupabase() {
+  readSettingsFromInputs();
+  const { url, key, table } = S.settings;
+  if (!url || !key) return setStatus('stSave', 'Supabase URL and anon key are required. Fill them in Settings above.', 'err');
+  if (!table) return setStatus('stSave', 'Table name is required in Settings', 'err');
+  syncDetails();
+  try {
+    setStatus('stSave', `Uploading ${S.photos.length} photo${S.photos.length !== 1 ? 's' : ''}…`);
+    const uploaded = [];
+    for (let i = 0; i < S.photos.length; i++) {
+      setStatus('stSave', `Uploading photo ${i + 1} of ${S.photos.length}…`);
+      uploaded.push(await uploadPhoto(S.photos[i], i));
+    }
+    setStatus('stSave', 'Saving item to database…');
+    const payload = {
+      title: S.selected?.title || S.lookupQuery || 'Untitled',
+      price: parseFloat(S.selected?.price || '0') || 0,
+      condition: S.selected?.condition || 'Used – Good',
+      description: S.selected?.description || '',
+      source: S.selected?.source || '',
+      upc: S.selected?.upc || '',
+      product_brand: S.selected?.brand || '',
+      product_model: S.selected?.model || '',
+      identify_value: S.lookupQuery || '',
+      photos: uploaded.map(p => p.url),
+      photo_paths: uploaded.map(p => p.path),
+      status: 'ready_to_post',
+      created_at_client: new Date().toISOString()
+    };
+    const base = url.replace(/\/$/, '');
+    const res = await fetch(`${base}/rest/v1/${encodeURIComponent(table)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        Prefer: 'return=representation'
+      },
+      body: JSON.stringify(payload)
+    });
+    const txt = await res.text();
+    if (!res.ok) throw new Error(txt || `Save failed (${res.status})`);
+    S.drafts = [{ ...payload, savedAt: new Date().toISOString() }, ...S.drafts].slice(0, 30);
+    S.draft = null;
+    persist();
+    setStatus('stSave', '✓ Saved to Supabase successfully!', 'ok');
+    setTimeout(() => {
+      resetFlow();
+      showPage('dashboard');
+    }, 1500);
+  } catch (e) {
+    console.error(e);
+    setStatus('stSave', e.message || 'Save failed', 'err');
+  }
+}
+
+function resetFlow() {
+  stopCamera();
+  S.step = 1;
+  S.lookupQuery = '';
+  S.results = [];
+  S.selected = null;
+  S.photos = [];
+  S.details = { title: '', price: '', condition: 'Used – Good', source: '', description: '' };
+  $('lookupText').value = '';
+  $('resultsList').innerHTML = '';
+  $('photosGrid').innerHTML = '';
+  setStep(1);
+  setStatus('stIdentify', '');
+}
+
+// ─────────────────────────────────────────────────────────────
+// DASHBOARD
+// ─────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const list = $('dashList');
+  if (!S.drafts.length) {
+    list.innerHTML = '<p style="color:var(--muted);font-size:.9rem">No saved items yet.</p>';
+    return;
+  }
+  list.innerHTML = S.drafts.map(d => {
+    const thumbSrc = d.photos?.[0] || '';
+    const date = d.savedAt ? new Date(d.savedAt).toLocaleDateString() : '';
+    return `<div class="dash-item">
+      ${thumbSrc ? `<img class="dash-thumb" src="${esc(thumbSrc)}" alt=""/>` : `<div class="dash-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.5rem">📦</div>`}
+      <div class="dash-info">
+        <h4>${esc(d.title || 'Untitled')}</h4>
+        <div class="meta">${d.price ? `$${d.price} • ` : ''}${esc(d.condition || '')}${date ? ` • ${date}` : ''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────
+// PWA INSTALL
+// ─────────────────────────────────────────────────────────────
+let installPromptEvent = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  installPromptEvent = e;
+  $('installBar').classList.remove('hidden');
+});
+window.addEventListener('appinstalled', () => {
+  $('installBar').classList.add('hidden');
+  installPromptEvent = null;
+});
+
+// ─────────────────────────────────────────────────────────────
+// WIRE UP ALL EVENTS
+// ─────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  hydrate();
+  applySettingsToInputs();
+  initSettingsAccordion();
+  setStep(1);
+  renderPhotos();
+  showPage('scanner');
+
+  // Install banner
+  $('installBtn').addEventListener('click', async () => {
+    if (!installPromptEvent) return;
+    installPromptEvent.prompt();
+    const { outcome } = await installPromptEvent.userChoice;
+    if (outcome === 'accepted') $('installBar').classList.add('hidden');
+  });
+  $('installClose').addEventListener('click', () => $('installBar').classList.add('hidden'));
+
+  // Nav
+  $('navScanner').addEventListener('click', () => showPage('scanner'));
+  $('navDash').addEventListener('click', () => showPage('dashboard'));
+
+  // Settings
+  $('btnSaveSettings').addEventListener('click', () => {
+    readSettingsFromInputs();
+    setStatus('stSettings', 'Settings saved', 'ok');
+  });
+  $('btnContinueDraft').addEventListener('click', loadDraft);
+
+  // Step 1 – Identify
+  $('btnStartScan').addEventListener('click', startLiveScan);
+  $('btnStopScan').addEventListener('click', stopLiveScan);
+  $('btnLookup').addEventListener('click', () => runLookup($('lookupText').value));
+  $('lookupText').addEventListener('keydown', e => {
+    if (e.key === 'Enter') runLookup($('lookupText').value);
+  });
+  $('btnUploadBarcode').addEventListener('click', () => $('inputBarcode').click());
+  $('inputBarcode').addEventListener('change', async e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    setStatus('stIdentify', 'Reading barcode from image…');
+    const code = await scanFileForBarcode(f);
+    e.target.value = '';
+    if (code) {
+      $('lookupText').value = code;
+      setStatus('stIdentify', `Detected: ${code}`, 'ok');
+      runLookup(code);
+    } else {
+      setStatus('stIdentify', 'No barcode detected in that image. Try scanning or typing the UPC manually.', 'warn');
+    }
+  });
+  $('btnUploadProduct').addEventListener('click', () => $('inputProduct').click());
+  $('inputProduct').addEventListener('change', e => {
+    const files = [...e.target.files].slice(0, 10 - S.photos.length);
+    files.forEach(f => {
+      const reader = new FileReader();
+      reader.onload = () => { S.photos.push(reader.result); renderPhotos(); };
+      reader.readAsDataURL(f);
+    });
+    e.target.value = '';
+    if (files.length) setStep(3);
+  });
+
+  // Step 2 – Results
+  $('btnBackToIdentify').addEventListener('click', () => setStep(1));
+
+  // Step 3 – Photos
+  $('btnCamStart').addEventListener('click', startCamera);
+  $('btnCamSwitch').addEventListener('click', async () => {
+    S.camFacing = S.camFacing === 'environment' ? 'user' : 'environment';
+    await startCamera();
+  });
+  $('btnCapture').addEventListener('click', capturePhoto);
+  $('btnBurst').addEventListener('click', burstCapture);
+  $('camVideo').addEventListener('click', e => {
+    const rect = e.target.getBoundingClientRect();
+    const ring = $('focusRing');
+    ring.style.left = (e.clientX - rect.left) + 'px';
+    ring.style.top = (e.clientY - rect.top) + 'px';
+    ring.classList.add('show');
+    setTimeout(() => ring.classList.remove('show'), 500);
+  });
+  $('btnAddPhotoFile').addEventListener('click', () => $('inputPhotoFile').click());
+  $('inputPhotoFile').addEventListener('change', e => {
+    const files = [...e.target.files].slice(0, 10 - S.photos.length);
+    files.forEach(f => {
+      const reader = new FileReader();
+      reader.onload = () => { S.photos.push(reader.result); renderPhotos(); };
+      reader.readAsDataURL(f);
+    });
+    e.target.value = '';
+  });
+  $('btnBackToResults').addEventListener('click', () => setStep(2));
+  $('btnToDetails').addEventListener('click', () => {
+    if (!S.photos.length) {
+      setStatus('stPhotos', 'Tip: Add at least one photo before continuing', 'warn');
+    }
+    setStep(4);  // Navigate regardless – photos are not strictly required
+  });
+
+  // Step 4 – Details
+  ['fTitle','fPrice','fCondition','fSource','fDescription'].forEach(id => {
+    $(id).addEventListener('input', syncDetails);
+  });
+  $('btnBackToPhotos').addEventListener('click', () => setStep(3));
+  $('btnToReview').addEventListener('click', () => {
+    syncDetails();
+    if (!$('fTitle').value.trim()) return setStatus('stDetails', 'Title is required', 'warn');
+    setStep(5);
+  });
+
+  // Step 5 – Review
+  $('btnBackToDetails').addEventListener('click', () => setStep(4));
+  $('btnSaveDraft').addEventListener('click', saveDraft);
+  $('btnSaveSupabase').addEventListener('click', saveToSupabase);
+
+  // Service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+});
+</script>
+</body>
+</html>
